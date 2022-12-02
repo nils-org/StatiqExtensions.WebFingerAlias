@@ -1,5 +1,5 @@
 ﻿using System.Text.Json;
-using Statiq.Extensions;
+using Statiq.Extensions.WebFingerAlias;
 using Statiq.Testing;
 
 namespace WebFingerAlias.Tests;

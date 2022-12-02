@@ -1,11 +1,18 @@
-﻿
-
-using Statiq.Extensions;
+﻿using Statiq.Extensions.WebFingerAlias;
 
 await Bootstrapper
     .Factory
-    .CreateDefault(args)
-    .AddSetting(SettingKeys.StaticResult, new
+    .CreateWeb(args)
+    //.AddSetting(SettingKeys.StaticResult, GetSerializableDemo())
+    .AddSetting(SettingKeys.StaticResult, GetStringDemo())
+    .WithWebFingerAlias()
+    .RunAsync();
+
+
+#pragma warning disable CS8321
+object GetSerializableDemo()
+{
+    return new
     {
         subject = "acct:nils_andresen@mastodon.social",
         aliases = new[]
@@ -33,6 +40,35 @@ await Bootstrapper
                 template = "https://mastodon.social/authorize_interaction?uri={uri}",
             },
         },
-    })
-    .AddPipeline(new WebFingerAlias())
-    .RunAsync();
+    };
+}
+
+object GetStringDemo()
+{
+    return """
+{
+  "subject": "acct:nils_andresen@mastodon.social",
+  "aliases": [
+    "https://mastodon.social/@nils_andresen",
+    "https://mastodon.social/users/nils_andresen"
+  ],
+  "links": [
+    {
+      "rel": "http://webfinger.net/rel/profile-page",
+      "type": "text/html",
+      "href": "https://mastodon.social/@nils_andresen"
+    },
+    {
+      "rel": "self",
+      "type": "application/activity+json",
+      "href": "https://mastodon.social/users/nils_andresen"
+    },
+    {
+      "rel": "http://ostatus.org/schema/1.0/subscribe",
+      "template": "https://mastodon.social/authorize_interaction?uri={uri}"
+    }
+  ]
+}
+""";
+}
+#pragma warning restore CS8321

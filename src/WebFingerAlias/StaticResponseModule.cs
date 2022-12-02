@@ -1,17 +1,18 @@
 ﻿using System.Text.Json;
 using Statiq.Common;
+using Statiq.Extensions.WebFingerAlias.Content;
 
-namespace Statiq.Extensions;
+namespace Statiq.Extensions.WebFingerAlias;
 
 public sealed class StaticResponseModule : Module
 {
-    protected override Task<IEnumerable<IDocument>> ExecuteContextAsync(IExecutionContext context)
+    protected override async Task<IEnumerable<IDocument>> ExecuteContextAsync(IExecutionContext context)
     {
         var staticResult = context.Get<object>(SettingKeys.StaticResult);
         if (staticResult == null)
         {
-            context.LogTrace(null, $"{nameof(WebFingerAlias)} no static alias configured.");
-            return Task.FromResult<IEnumerable<IDocument>>(Array.Empty<IDocument>());
+            context.LogTrace(null, "No static alias configured.");
+            return Array.Empty<IDocument>();
         }
 
         JsonContent content;
@@ -31,18 +32,28 @@ public sealed class StaticResponseModule : Module
                 }
                 catch (Exception e)
                 {
-                    throw new ArgumentException($"content of type {staticResult.GetType().Name} could not be parsed to json. {e.GetType().Name}: {e.Message}");
+                    throw new ArgumentException(
+                        $"content of type {staticResult.GetType().Name} could not be parsed to json. {e.GetType().Name}: {e.Message}");
                 }
 
                 break;
         }
         
-        context.LogTrace(null, $"{nameof(WebFingerAlias)} using static configured value.");
+        context.LogTrace(null, $"Using static configured value.");
 
-        return Task.FromResult<IEnumerable<IDocument>>(
-            new []
+        return await context.CreateDocument(
+            NormalizedPath.AbsoluteRoot / ".well-known/webfinger", // Source is needed for input. 
+            new NormalizedPath(".well-known/webfinger", PathKind.Relative),
+            new Dictionary<string, object>
             {
-                new WebFingerDocument(content),
-            });
+                { "IsWebFingerDocument", true },
+                { "ShouldOutput", true },
+                { "ContentType", "Content" },
+                { "MediaType", "application/json" },
+                { "IncludeInSitemap", false },
+                { Common.Keys.DestinationExtension, null! }, // really, no extension. I mean it.
+                { Common.Keys.DestinationFileName, "webfinger" },
+            },
+            content).YieldAsync();
     }
 }

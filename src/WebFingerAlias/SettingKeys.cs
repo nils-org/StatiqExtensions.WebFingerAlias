@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 
-namespace Statiq.Extensions;
+namespace Statiq.Extensions.WebFingerAlias;
 
 public static class SettingKeys
 {
