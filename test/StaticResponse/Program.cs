@@ -1,11 +1,9 @@
-﻿using Statiq.Extensions.WebFingerAlias;
-
-await Bootstrapper
+﻿await Bootstrapper
     .Factory
     .CreateWeb(args)
     //.AddSetting(SettingKeys.StaticResult, GetSerializableDemo())
-    .AddSetting(SettingKeys.StaticResult, GetStringDemo())
-    .WithWebFingerAlias()
+    //.AddSetting(SettingKeys.StaticResult, GetStringDemo())
+    .WithWebFingerAlias("@nils_andresen@mastodon.social")
     .RunAsync();
 
 

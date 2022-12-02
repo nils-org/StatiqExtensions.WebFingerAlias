@@ -81,4 +81,54 @@ public static class BootstrapperExtensions
                     pipeline.InputModules.Add(new StaticResponseModule());
                 })
         );
+
+    /// <summary>
+    /// This extension does the same, as <see cref="WithWebFingerAlias{TBootstrapper}(TBootstrapper)"/>,
+    /// except that no explicit setting is needed.
+    /// The required setting will be generated on-the-fly.
+    ///
+    /// <example><code>
+    ///
+    /// </code></example>
+    /// </summary>
+    public static TBootstrapper WithWebFingerAlias<TBootstrapper>(this TBootstrapper bootstrapper, string userHandle)
+        where TBootstrapper : IBootstrapper
+    {
+        var split = userHandle.TrimStart('@').Split('@', 2);
+        if (split.Length != 2)
+        {
+            throw new ArgumentOutOfRangeException(nameof(userHandle), "UserHandle must be in the format of 'user@server.domain'");
+        }
+        var user = split[0];
+        var instance = split[1];
+
+        var result = $$"""
+{
+  "subject": "acct:{{user}}@{{instance}}",
+  "aliases": [
+    "https://{{instance}}/@{{user}}",
+    "https://{{instance}}/users/{{user}}"
+  ],
+  "links": [
+    {
+      "rel": "http://webfinger.net/rel/profile-page",
+      "type": "text/html",
+      "href": "https://{{instance}}/@{{user}}"
+    },
+    {
+      "rel": "self",
+      "type": "application/activity+json",
+      "href": "https://{{instance}}/users/{{user}}"
+    },
+    {
+      "rel": "http://ostatus.org/schema/1.0/subscribe",
+      "template": "https://{{instance}}/authorize_interaction?uri={uri}"
+    }
+  ]
+}
+""";
+        
+        bootstrapper.ConfigureSettings(x => x[SettingKeys.StaticResult] = result);
+        return WithWebFingerAlias(bootstrapper);
+    }
 }
