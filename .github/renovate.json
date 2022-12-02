@@ -3,7 +3,7 @@
   "extends": [ "github>nils-a/renovate-config:testing" ],
   "packageRules": [
     {
-      "matchPackageNames": ["statiq.core", "statiq.common"],
+      "matchPackageNames": ["Statiq.Core", "Statiq.Common", "cake.tool"],
       "enabled": false
     }
   ]
