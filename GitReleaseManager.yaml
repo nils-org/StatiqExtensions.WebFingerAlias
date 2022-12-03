@@ -39,5 +39,5 @@ close:
     :tada: This issue has been resolved in version {milestone} :tada:
     The release is available on:
     - [GitHub Release](https://github.com/{owner}/{repository}/releases/tag/{milestone})
-    - [NuGet Package](https://www.nuget.org/packages/StatiqExtension.WebFingerAlias/{milestone})
+    - [NuGet Package](https://www.nuget.org/packages/StatiqExtensions.WebFingerAlias/{milestone})
     Your **[GitReleaseManager](https://github.com/GitTools/GitReleaseManager)** bot :package::rocket:
