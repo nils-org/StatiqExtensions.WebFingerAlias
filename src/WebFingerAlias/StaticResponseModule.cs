@@ -40,20 +40,22 @@ public sealed class StaticResponseModule : Module
         }
         
         context.LogTrace(null, $"Using static configured value.");
-
-        return await context.CreateDocument(
-            NormalizedPath.AbsoluteRoot / ".well-known/webfinger", // Source is needed for input. 
-            new NormalizedPath(".well-known/webfinger", PathKind.Relative),
-            new Dictionary<string, object>
-            {
-                { "IsWebFingerDocument", true },
-                { "ShouldOutput", true },
-                { "ContentType", "Content" },
-                { "MediaType", "application/json" },
-                { "IncludeInSitemap", false },
-                { Common.Keys.DestinationExtension, null! }, // really, no extension. I mean it.
-                { Common.Keys.DestinationFileName, "webfinger" },
-            },
-            content).YieldAsync();
+        
+        var output = context.Inputs.Add(context.CreateDocument(
+                NormalizedPath.AbsoluteRoot / ".well-known/webfinger", // Source is needed for input. 
+                new NormalizedPath(".well-known/webfinger", PathKind.Relative),
+                new Dictionary<string, object>
+                {
+                    { "IsWebFingerDocument", true },
+                    { "ShouldOutput", true },
+                    { "ContentType", "Content" },
+                    { "MediaType", "application/json" },
+                    { "IncludeInSitemap", false },
+                    { Common.Keys.DestinationExtension, null! }, // really, no extension. I mean it.
+                    { Common.Keys.DestinationFileName, "webfinger" },
+                },
+                content)
+            );
+        return output;
     }
 }
